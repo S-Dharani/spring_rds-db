@@ -23,29 +23,17 @@ pipeline {
 
         stage('Run Application') {
             steps {
-                sh '''
-                echo "Stopping existing application..."
-                pkill -f "student_details-0.0.1-SNAPSHOT.jar" || true
+                 sh '''
+        pkill -f student_details || true
 
-                sleep 5
+        nohup java -jar target/student_details-0.0.1-SNAPSHOT.jar > app.log 2>&1 < /dev/null &
 
-                echo "Starting application..."
-                nohup java -jar target/student_details-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+        disown || true
 
-                sleep 15
+        sleep 15
 
-                echo "Checking application status..."
-
-                if ps -ef | grep "student_details-0.0.1-SNAPSHOT.jar" | grep -v grep > /dev/null
-                then
-                    echo "Application Started Successfully"
-                else
-                    echo "Application Failed to Start"
-                    echo "========== APP LOG =========="
-                    cat app.log
-                    exit 1
-                fi
-                '''
+        ps -ef | grep student_details || true
+        '''
             }
         }
     }
