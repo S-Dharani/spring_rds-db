@@ -26,7 +26,7 @@ pipeline {
                  sh '''
         pkill -f student_details || true
 
-        nohup java -jar target/student_details-0.0.1-SNAPSHOT.jar > app.log 2>&1 < /dev/null &
+        java -jar target/student_details-0.0.1-SNAPSHOT.jar
 
         disown || true
 
