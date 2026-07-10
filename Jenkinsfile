@@ -38,11 +38,13 @@ pipeline {
 
         stage('Run Application') {
               steps {
-        sh '''
+       sh '''
         cd /var/lib/jenkins/workspace/app
         pkill -f student_details || true
-        BUILD_ID=dontKillMe nohup java -jar target/student_details-0.0.1-SNAPSHOT.jar > target/app.log 2>&1 &
+        chmod +x target/student_details-0.0.1-SNAPSHOT.jar
+        nohup java -jar target/student_details-0.0.1-SNAPSHOT.jar > target/app.log 2>&1 &
         sleep 20
+        ps -ef | grep student_details | grep -v grep || true
         '''
     }
         }
