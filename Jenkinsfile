@@ -7,6 +7,12 @@ pipeline {
 
     stages {
 
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'mvn clean package -DskipTests'
@@ -21,19 +27,29 @@ pipeline {
             }
         }
 
+        stage('Stop Old Application') {
+            steps {
+                sh '''
+                pkill -f student_details || true
+                sleep 5
+                '''
+            }
+        }
+
         stage('Run Application') {
             steps {
-                 sh '''
-        pkill -f student_details || true
+                sh '''
+                nohup java -jar target/student_details-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+                sleep 20
+                '''
+            }
+        }
 
-        java -jar target/student_details-0.0.1-SNAPSHOT.jar
-
-        disown || true
-
-        sleep 15
-
-        ps -ef | grep student_details || true
-        '''
+        stage('Verify Application') {
+            steps {
+                sh '''
+                ps -ef | grep student_details | grep -v grep
+                '''
             }
         }
     }
