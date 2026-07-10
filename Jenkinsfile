@@ -37,12 +37,16 @@ pipeline {
         }
 
         stage('Run Application') {
-            steps {
-                sh '''
-                nohup java -jar target/student_details-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-                sleep 20
-                '''
-            }
+             steps {
+        sh '''
+        cd /var/lib/jenkins/workspace/app
+        pkill -f student_details || true
+        chmod +x target/student_details-0.0.1-SNAPSHOT.jar
+        nohup java -jar target/student_details-0.0.1-SNAPSHOT.jar > target/app.log 2>&1 &
+        sleep 20
+        ps -ef | grep student_details | grep -v grep || true
+        '''
+    }
         }
 
         stage('Verify Application') {
